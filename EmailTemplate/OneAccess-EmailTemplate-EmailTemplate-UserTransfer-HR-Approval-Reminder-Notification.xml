@@ -1,0 +1,64 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE EmailTemplate PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<EmailTemplate name="EmailTemplate-UserTransfer-HR-Approval-Reminder-Notification">
+  <Body>
+    &lt;html&gt;
+    &lt;body&gt;
+    &lt;head&gt;
+    &lt;title&gt;&lt;/title&gt;
+    &lt;meta http-equiv="Content-Type" content="text/html; charset=UTF-8"&gt;
+    &lt;style type="text/css"&gt;
+    p.signature
+    { margin:0in;
+    }
+    span.signature1
+    {
+    font-size:8.0pt;
+    font-family:"Arial",sans-serif;
+    color:#004B87;
+    }
+    span.signature2
+    {
+    font-size:8.0pt;
+    font-family:"Arial",sans-serif;
+    color:#00A3E0;
+    }
+    span.signature3
+    {
+    font-size:8.0pt;
+    font-family:"Arial",sans-serif;
+    color:#1F497D";
+    }
+    &lt;/style&gt;
+    &lt;/head&gt;
+    &lt;font color='#f5142a'&gt;&lt;b&gt;*Note&lt;/b&gt;&lt;/font&gt;: This is a system generated email, please do not reply to this email.&lt;br&gt;&lt;br&gt;
+    #set($ctx = $spTools.class.forName("sailpoint.api.SailPointFactory").getMethod("getFactory", null).invoke(null,null).getCurrentContext())
+    #set($emailTools = $spTools.class.forName("sailpoint.rapidsetup.tools.EmailTools").getMethod("instance", null).invoke(null,null))
+    #set($reqType = $workflow.requestType)
+    #set($styleSheet = $emailTools.getEmailSection($ctx, "styleSheet"))
+    #set($headerTemplate = $emailTools.getEmailSection($ctx, "headerTemplate"))
+    #set($footerTemplate = $emailTools.getEmailSection($ctx, "footerTemplate"))
+
+    Hello, &lt;br&gt;&lt;br&gt;
+
+    User Transfer HR Approval Reminder Notification. &lt;br&gt;&lt;br&gt;
+
+    Thank you,&lt;br/&gt; 
+
+    &lt;/body&gt;
+    &lt;/html&gt;
+
+
+  </Body>
+  <Description>
+    EmailTemplate-UserTransfer-HR Approval Reminder Notification
+  </Description>
+  <Signature>
+    <Inputs>
+      <Argument name="workflow" type="Workflow">
+        <Description>The Workflow object being executed.</Description>
+      </Argument>
+    </Inputs>
+  </Signature>
+  <Subject>User Transfer HR Approval Reminder Notification</Subject>
+</EmailTemplate>

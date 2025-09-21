@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE IdentityTrigger PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<IdentityTrigger attributeName="location" handler="sailpoint.api.WorkflowTriggerHandler" name="User Transfer" newValueFilter="" oldValueFilter="" type="AttributeChange">
+  <Description>User Transfer Event</Description>
+  <Owner>
+    <Reference class="sailpoint.object.Identity" name="spadmin"/>
+  </Owner>
+  <HandlerParameters>
+    <Attributes>
+      <Map>
+        <entry key="businessProcess"/>
+        <entry key="identityProcessingThreshold"/>
+        <entry key="identityProcessingThresholdType"/>
+        <entry key="workflow" value="Workflow-User-Transfer"/>
+      </Map>
+    </Attributes>
+  </HandlerParameters>
+</IdentityTrigger>

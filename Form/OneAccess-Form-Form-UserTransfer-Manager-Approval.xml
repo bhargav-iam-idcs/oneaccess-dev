@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Form PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Form name="Form-UserTransfer-Manager-Approval" type="Workflow">
+  <Attributes>
+    <Map>
+      <entry key="pageTitle" value="Manager Approval for User Transfer"/>
+    </Map>
+  </Attributes>
+  <Section label="Provide Manager Approval for User Transfer">
+    <Field displayName="Manager Aproval" name="name" type="string">
+      <AllowedValuesDefinition>
+        <Script>
+          <Source>
+            import java.util.ArrayList;
+            import java.util.List;
+
+            List decisionList = new ArrayList();
+            decisionList.add("Approved");
+            decisionList.add("Rejected");
+
+            return decisionList;
+          </Source>
+        </Script>
+      </AllowedValuesDefinition>
+    </Field>
+  </Section>
+  <Button action="next" label="Next" parameter="approved" value="true"/>
+  <Button action="next" label="Cancel" parameter="exitWorkflow" skipValidation="true" value="true"/>
+</Form>

@@ -1,0 +1,40 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE TaskDefinition PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<TaskDefinition name="Test Report 1" resultAction="Rename" type="LiveReport">
+  <Attributes>
+    <Map>
+      <entry key="TaskSchedule.host"/>
+      <entry key="disableDetail" value="false"/>
+      <entry key="disableHeader" value="false"/>
+      <entry key="disableSummary" value="false"/>
+      <entry key="dontEmailEmptyReport">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="emailFileFormat">
+        <value>
+          <List>
+            <String>PDF</String>
+            <String>CSV</String>
+          </List>
+        </value>
+      </entry>
+      <entry key="enableCsvHeader" value="false"/>
+      <entry key="reportColumnOrder" value="idname, dispname"/>
+      <entry key="reportSortAsc">
+        <value>
+          <Boolean>true</Boolean>
+        </value>
+      </entry>
+      <entry key="reportSortBy" value="dispname"/>
+    </Map>
+  </Attributes>
+  <Description>This report will return list of Terminated users with active accounts</Description>
+  <Owner>
+    <Reference class="sailpoint.object.Identity" name="spadmin"/>
+  </Owner>
+  <Parent>
+    <Reference class="sailpoint.object.TaskDefinition" name="Test Report"/>
+  </Parent>
+</TaskDefinition>

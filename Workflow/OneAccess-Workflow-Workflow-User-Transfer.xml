@@ -1,0 +1,262 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Workflow PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Workflow explicitTransitions="true" libraries="Identity,IdentityRequest" name="Workflow-User-Transfer" type="IdentityLifecycle">
+  <Variable initializer="true" name="transient"/>
+  <Variable input="true" name="trigger">
+    <Description>The IdentityTrigger</Description>
+  </Variable>
+  <Variable input="true" name="event" transient="true">
+    <Description>
+      The IdentityChangeEvent.  It can be used to build
+      the provisioning plan, but does not need to be
+      persisted with the case, so marked as transient.
+    </Description>
+  </Variable>
+  <Variable input="true" name="identityName">
+    <Description>The name of the identity.</Description>
+  </Variable>
+  <Variable initializer="Lifecycle Event: User Transfer" name="flow"/>
+  <Variable name="HRApprovalWorkitemID">
+    <Description>
+      WorkItem ID for HR Approval
+    </Description>
+  </Variable>
+  <Variable name="HRApprovalWorkitemState">
+    <Description>
+      WorkItem State for HR Approval
+    </Description>
+  </Variable>
+  <Variable name="ManagerApprovalWorkitemID">
+    <Description>
+      WorkItem ID for Manager Approval
+    </Description>
+  </Variable>
+  <Variable name="ManagerApprovalWorkitemState">
+    <Description>
+      WorkItem State for Manager Approval
+    </Description>
+  </Variable>
+  <Step icon="Start" name="Start" posX="28" posY="10">
+    <Transition to="HR Approval"/>
+  </Step>
+  <Step icon="Approval" name="HR Approval" posX="98" posY="10">
+    <Approval mode="serial" name="HRApproval" owner="1a2a3a" return="exitWorkflow,identityModel" send="exitWorkflow,identityModel">
+      <Arg name="workItemForm" value="Form-UserTransfer-HR-Approval"/>
+      <Arg name="workItemType" value="Form"/>
+      <Arg name="workItemFormBasePath" value="identityModel"/>
+      <Arg name="workItemDescription" value="HR Approval for User Transfer"/>
+      <InterceptorScript>
+        <Source>
+          import java.util.Date;
+          import sailpoint.tools.Util;
+          import sailpoint.object.WorkItem;
+
+          import org.apache.commons.logging.Log;
+          import org.apache.commons.logging.LogFactory;
+
+          Log log = LogFactory.getLog("com.test.workflow");
+          String workflowName = "Workflow-User-Transfer";
+          log.info("Workflow :: "+workflowName+" :: InterceptorScript HR Approval Started");
+          if(null != item) {
+          log.info("item :: "+item+" :: item xml :: " +item.toXml());		
+
+          if(item.getState() == null){
+
+          Date expirationDate = Util.incrementDateByMinutes(new Date(),7200);
+          log.info("Workflow :: "+workflowName+" :: expirationDate :: "+expirationDate);
+
+          if(null != expirationDate) {
+          item.setExpiration(expirationDate);
+          item.setWakeUpDate(expirationDate);
+          context.saveObject(item);
+          context.commitTransaction();
+          }
+          } else{
+
+          String workItemState = item.getState().toString();
+          log.info("Workflow :: "+workflowName+" :: workItemState :: "+workItemState);
+          workflow.put("HRApprovalWorkitemState", workItemState);
+
+          }
+
+          log.info("Workflow :: "+workflowName+" :: HRApprovalWorkitemID :: "+item.getId());
+          workflow.put("HRApprovalWorkitemID", item.getId());
+          }
+
+          log.info("Workflow :: "+workflowName+" :: InterceptorScript HR Approval Ended");			
+        </Source>
+      </InterceptorScript>
+      <WorkItemConfig escalationStyle="reminder" hoursBetweenReminders="24" hoursTillEscalation="48" maxReminders="4">
+        <NotificationEmailTemplateRef>
+          <Reference class="sailpoint.object.EmailTemplate" name="EmailTemplate-UserTransfer-HR-Approval-Notification"/>
+        </NotificationEmailTemplateRef>
+        <ReminderEmailTemplateRef>
+          <Reference class="sailpoint.object.EmailTemplate" name="EmailTemplate-UserTransfer-HR-Approval-Reminder-Notification"/>
+        </ReminderEmailTemplateRef>
+      </WorkItemConfig>
+    </Approval>
+    <Transition to="Stop" when="exitWorkflow"/>
+    <Transition to="Manager Approval" when="approved"/>
+    <Transition to="Validation Step 1">
+      <Script>
+        <Source>
+          import sailpoint.object.WorkItem;
+
+          import org.apache.commons.logging.Log;
+          import org.apache.commons.logging.LogFactory;
+
+          Log log = LogFactory.getLog("com.test.workflow");
+          String workflowName = "Workflow-User-Transfer";
+          log.info("Workflow :: "+workflowName+" :: Transition to Validation Step 1 Started");
+          log.info("Workflow :: "+workflowName+" :: HRApprovalWorkitemID :: " +HRApprovalWorkitemID);
+          log.info("Workflow :: "+workflowName+" :: HRApprovalWorkitemState :: " +HRApprovalWorkitemState);
+          if(null != HRApprovalWorkitemState @and HRApprovalWorkitemState.equals("Expired")) {
+          log.info("Workflow :: "+workflowName+" :: Transition to Validation Step 1 :: return true");
+          log.info("Workflow :: "+workflowName+" :: Transition to Validation Step 1 Ended");
+          return true;
+          }
+
+          return false;
+
+          log.info("Workflow :: "+workflowName+" :: Transition to Validation Step 1 Ended");
+        </Source>
+      </Script>
+    </Transition>
+  </Step>
+  <Step icon="Analysis" name="Validation Step 1" posX="392" posY="3">
+    <Script>
+      <Source>
+
+        import org.apache.commons.logging.Log;
+        import org.apache.commons.logging.LogFactory;
+
+        Log log = LogFactory.getLog("com.test.workflow");
+        String workflowName = "Workflow-User-Transfer";
+        log.info("Workflow :: "+workflowName+" :: Validation Step 1");
+
+
+        log.info("Workflow :: "+workflowName+" :: Validation Step 1");			
+      </Source>
+    </Script>
+    <Transition to="Manager Approval"/>
+  </Step>
+  <Step icon="Approval" name="Manager Approval" posX="244" posY="7">
+    <Approval mode="serial" name="ManagerApproval" owner="1a2a3a4a" return="identityModel">
+      <Arg name="workItemForm" value="Form-UserTransfer-Manager-Approval"/>
+      <Arg name="workItemType" value="Form"/>
+      <Arg name="workItemFormBasePath" value="identityModel"/>
+      <Arg name="workItemDescription" value="Manager Approval for User Transfer"/>
+      <InterceptorScript>
+        <Source>
+          import java.util.Date;
+          import sailpoint.tools.Util;
+          import sailpoint.object.WorkItem;
+
+          import org.apache.commons.logging.Log;
+          import org.apache.commons.logging.LogFactory;
+
+          Log log = LogFactory.getLog("com.test.workflow");
+          String workflowName = "Workflow-User-Transfer";
+          log.info("Workflow :: "+workflowName+" :: InterceptorScript Manager Approval Started");
+          if(null != item) {
+          log.info("item :: "+item+" :: item xml :: " +item.toXml());		
+
+          if(item.getState() == null){
+
+          Date expirationDate = Util.incrementDateByMinutes(new Date(),7200);
+          log.info("Workflow :: "+workflowName+" :: expirationDate :: "+expirationDate);
+
+          if(null != expirationDate) {
+          item.setExpiration(expirationDate);
+          item.setWakeUpDate(expirationDate);
+          context.saveObject(item);
+          context.commitTransaction();
+          }
+          } else{
+
+          String workItemState = item.getState().toString();
+          log.info("Workflow :: "+workflowName+" :: workItemState :: "+workItemState);
+          workflow.put("ManagerApprovalWorkitemID", workItemState);
+
+          }
+
+          log.info("Workflow :: "+workflowName+" :: ManagerApprovalWorkitemID :: "+item.getId());
+          workflow.put("ManagerApprovalWorkitemID", item.getId());
+          }
+
+          log.info("Workflow :: "+workflowName+" :: InterceptorScript Manager Approval Ended");			
+        </Source>
+      </InterceptorScript>
+      <WorkItemConfig escalationStyle="reminder" hoursBetweenReminders="24" hoursTillEscalation="48" maxReminders="4">
+        <NotificationEmailTemplateRef>
+          <Reference class="sailpoint.object.EmailTemplate" name="EmailTemplate-UserTransfer-HR-Approval-Notification"/>
+        </NotificationEmailTemplateRef>
+        <ReminderEmailTemplateRef>
+          <Reference class="sailpoint.object.EmailTemplate" name="EmailTemplate-UserTransfer-HR-Approval-Reminder-Notification"/>
+        </ReminderEmailTemplateRef>
+      </WorkItemConfig>
+    </Approval>
+    <Transition to="Stop" when="exitWorkflow"/>
+    <Transition to="Validation Step 2" when="approved"/>
+    <Transition to="Validation Step 3">
+      <Script>
+        <Source>
+          import sailpoint.object.WorkItem;
+
+          import org.apache.commons.logging.Log;
+          import org.apache.commons.logging.LogFactory;
+
+          Log log = LogFactory.getLog("com.test.workflow");
+          String workflowName = "Workflow-User-Transfer";
+          log.info("Workflow :: "+workflowName+" :: Transition to Validation Step 3 Started");
+          log.info("Workflow :: "+workflowName+" :: ManagerApprovalWorkitemID :: " +ManagerApprovalWorkitemID);
+          log.info("Workflow :: "+workflowName+" :: ManagerApprovalWorkitemState :: " +ManagerApprovalWorkitemState);
+          if(null != ManagerApprovalWorkitemState @and ManagerApprovalWorkitemState.equals("Expired")) {
+          log.info("Workflow :: "+workflowName+" :: Transition to Validation Step 3 :: return true");
+          log.info("Workflow :: "+workflowName+" :: Transition to Validation Step 3 Ended");
+          return true;
+          }
+
+          return false;
+
+          log.info("Workflow :: "+workflowName+" :: Transition to Validation Step 3 Ended");
+        </Source>
+      </Script>
+    </Transition>
+  </Step>
+  <Step icon="Analysis" name="Validation Step 2" posX="392" posY="3">
+    <Script>
+      <Source>
+
+        import org.apache.commons.logging.Log;
+        import org.apache.commons.logging.LogFactory;
+
+        Log log = LogFactory.getLog("com.test.workflow");
+        String workflowName = "Workflow-User-Transfer";
+        log.info("Workflow :: "+workflowName+" :: Validation Step 2 Started");
+
+
+        log.info("Workflow :: "+workflowName+" :: Validation Step 2 Ended");			
+      </Source>
+    </Script>
+    <Transition to="Stop"/>
+  </Step>
+  <Step icon="Analysis" name="Validation Step 3" posX="392" posY="3">
+    <Script>
+      <Source>
+
+        import org.apache.commons.logging.Log;
+        import org.apache.commons.logging.LogFactory;
+
+        Log log = LogFactory.getLog("com.test.workflow");
+        String workflowName = "Workflow-User-Transfer";
+        log.info("Workflow :: "+workflowName+" :: Validation Step 3 Started");
+
+
+        log.info("Workflow :: "+workflowName+" :: Validation Step 3 Ended");			
+      </Source>
+    </Script>
+    <Transition to="Stop"/>
+  </Step>
+  <Step icon="Stop" name="Stop" posX="165" posY="130"/>
+</Workflow>

@@ -1,0 +1,34 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE TaskDefinition PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<TaskDefinition name="Users with multiple departments" resultAction="Rename" type="LiveReport">
+  <Attributes>
+    <Map>
+      <entry key="TaskSchedule.host"/>
+      <entry key="disableDetail" value="false"/>
+      <entry key="disableHeader" value="false"/>
+      <entry key="disableSummary" value="false"/>
+      <entry key="dontEmailEmptyReport">
+        <value>
+          <Boolean/>
+        </value>
+      </entry>
+      <entry key="emailFileFormat">
+        <value>
+          <List>
+            <String>PDF</String>
+            <String>CSV</String>
+          </List>
+        </value>
+      </entry>
+      <entry key="enableCsvHeader" value="false"/>
+      <entry key="reportColumnOrder" value="idname, dispname, department"/>
+    </Map>
+  </Attributes>
+  <Description>This report returns the list of users with multiple departments</Description>
+  <Owner>
+    <Reference class="sailpoint.object.Identity" name="spadmin"/>
+  </Owner>
+  <Parent>
+    <Reference class="sailpoint.object.TaskDefinition" name="Report-Users-With-Multiple-Departments"/>
+  </Parent>
+</TaskDefinition>

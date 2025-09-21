@@ -1,0 +1,91 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Rule PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<Rule language="beanshell" name="Test Rule">
+  <Description>Test Rule</Description>
+  <Source>
+
+  import java.util.ArrayList;
+  import java.util.List;
+  import java.util.Iterator;
+  import java.util.Collections;
+  import java.text.ParseException;
+  import sailpoint.api.SailPointContext;
+  import sailpoint.object.Identity;
+  import sailpoint.object.Link;
+  import sailpoint.object.Filter;
+  import sailpoint.object.QueryOptions;
+  import sailpoint.tools.GeneralException;
+  import java.text.DateFormat;
+  import java.text.SimpleDateFormat;
+  import java.util.Date;
+  import sailpoint.object.Application;
+  import sailpoint.api.IdentityService;
+  import sailpoint.object.Filter.MatchMode;
+
+  import sailpoint.tools.Util;
+  import org.apache.log4j.Logger;
+  import org.apache.log4j.Level;
+
+  Logger log = Logger.getLogger("com.test.report");
+
+  log.info("QueryParameter: Enter Report-Users-With-Multiple-Departments");
+
+
+  QueryOptions qo = new QueryOptions();
+  
+
+
+  Filter f1 = Filter.eq("status","Employee");
+//  Filter f2 = Filter.ne("inactive","true");
+//  qo.addFilter(Filter.and(f1,f2));
+  
+  qo.addFilter(f1);
+  log.info("Report-Users-With-Multiple-Departments :: qo :: " + qo);
+  
+    
+
+  Iterator iterator = context.search(Identity.class, qo);
+  
+  return "OK";
+
+  // List activeEmpList = new ArrayList();
+
+  while (iterator.hasNext()) {
+    Identity identity = (Identity) iterator.next();
+
+   // log.info("Report-Users-With-Multiple-Departments :: " + identity.getAttribute("department"));
+
+   // List departmentList = new ArrayList();
+
+    /*
+
+                      if((identity.getAttribute("department")) instanceof List){
+                      log.info("Report-Users-With-Multiple-Departments :: identityName :: " + identity.getName() + " :: is instance of List");
+                      departmentList = (List) identity.getAttribute("department");
+                      if(departmentList.size() &gt; 1 ){
+                      log.info("Report-Users-With-Multiple-Departments :: identityName :: " + identity.getName());
+                      activeEmpList.add(identity.getId());
+                      }
+                      } else {
+                       log.info("Report-Users-With-Multiple-Departments :: identityName :: " + identity.getName() + " :: is NOT instance of List" );
+                      }
+                      }
+
+                      */
+
+
+  }
+  
+  return "OK";
+  /*
+    QueryOptions qoReturn = new QueryOptions();
+    if(activeEmpList != null @and !activeEmpList.isEmpty()){
+      qoReturn.addFilter(Filter.in("id", activeEmpList));
+      log.info("Report-Users-With-Multiple-Departments :: qoReturn :: " + qoReturn);
+      return qoReturn;
+    }
+    log.info("Report-Users-With-Multiple-Departments :: qoReturn :: " + qoReturn);
+    return qoReturn;
+*/
+    </Source>
+</Rule>

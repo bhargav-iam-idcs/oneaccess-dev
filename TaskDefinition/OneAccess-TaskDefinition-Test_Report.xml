@@ -1,0 +1,178 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE TaskDefinition PUBLIC "sailpoint.dtd" "sailpoint.dtd">
+<TaskDefinition executor="sailpoint.reporting.LiveReportExecutor" name="Test Report" progressMode="Percentage" resultAction="Rename" template="true" type="LiveReport">
+  <Attributes>
+    <Map>
+      <entry key="emailFileFormat">
+        <value>
+          <List>
+            <String>PDF</String>
+            <String>CSV</String>
+          </List>
+        </value>
+      </entry>
+      <entry key="report">
+        <value>
+          <LiveReport title="Test Report">
+            <DataSource objectType="sailpoint.object.Identity" type="Filter">
+              <QueryParameters>
+                <Parameter>
+                  <QueryScript>
+                    <Source>
+                      import java.lang.Integer;
+                      import java.text.DateFormat;
+                      import java.text.ParseException;
+                      import java.text.SimpleDateFormat;
+                      import java.util.ArrayList;
+                      import java.util.Date;
+                      import java.util.Iterator;
+                      import java.util.List;
+
+                      import org.apache.log4j.Level;
+                      import org.apache.log4j.Logger;
+
+                      import sailpoint.object.Filter;
+                      import sailpoint.object.Link;
+                      import sailpoint.object.*;
+                      import sailpoint.object.QueryOptions;
+                      import sailpoint.tools.GeneralException;
+                      import sailpoint.tools.Util;
+
+                      Logger log = Logger.getLogger("com.test.report");
+
+                      log.debug("QueryParameter: Enter Test Report");
+
+                      QueryOptions qo = new QueryOptions(); 
+
+                      qo.addFilter(Filter.eq("application.name", "HR System - Employees"));
+
+                      Iterator iterator1 = context.search(Link.class, qo);
+
+                      HashMap map1 = new HashMap();
+                      if (iterator1 != null) {
+                      while (iterator1.hasNext()) {
+
+                      Link lnk = (Link) iterator1.next();
+                      Identity id = lnk.getIdentity();
+                      map1.put(id.getId(),lnk);
+
+                      }
+                      }
+
+                      QueryOptions qo1 = new QueryOptions(); 
+
+                      qo1.addFilter(Filter.eq("application.name", "HR System - Employees"));
+
+
+                      Iterator iterator2 = context.search(Link.class, qo1);
+
+                      HashMap map2 = new HashMap();
+                      if (iterator2 != null) {
+                      while (iterator2.hasNext()) {
+
+                      Link lnk = (Link) iterator2.next();
+                      Identity id = lnk.getIdentity();
+                      map2.put(id.getId(),lnk);
+                      }
+                      }
+
+
+                      HashMap greater = map1;
+                      HashMap smaller = map2;
+
+                      if(map2.size() &gt; map1.size()){
+                      greater = map2;
+                      smaller = map1;
+                      }
+                      Set identitie = new HashSet();
+                      for (Map.Entry entry: greater.entrySet()){
+                      for (Map.Entry entry1: smaller.entrySet()){
+                      if(entry.getKey() == entry1.getKey()){
+                      identitie.add(entry.getKey());
+                      }
+                      else {
+                      if(entry.getKey() != null){
+                      identitie.add(entry.getKey());
+                      }
+                      if(entry1.getKey() != null){
+                      identitie.add(entry1.getKey());
+                      }
+                      }
+                      }
+                      }
+
+
+                      if(identitie.size() &gt; 0) {
+                      log.debug("In scope terminated with active= accounts count: " + identitie.size());
+                      }
+                      else {
+                      identitie.add("no match found"); //need to pass dummy value that will not match any id if there are no active accounts that are terminated
+                      }
+
+                      queryOptions.addFilter(Filter.in("id", identitie));
+
+                      return queryOptions;											
+                    </Source>
+                  </QueryScript>
+                </Parameter>
+              </QueryParameters>
+            </DataSource>
+            <Columns>
+              <ReportColumnConfig field="idname" header="Username" property="id" sortable="true" width="110">
+                <RenderScript>
+                  <Source>
+                    import sailpoint.object.Identity;
+                    import sailpoint.object.Link;
+                    import sailpoint.object.Application;
+
+                    Identity identity = context.getObjectById(Identity.class, value);
+
+                    String strValue = null;
+
+                    if(identity != void &amp;&amp; identity != null) {
+
+                    strValue = identity.getName();
+
+                    }
+
+                    return strValue;
+                  </Source>
+                </RenderScript>
+              </ReportColumnConfig>
+              <ReportColumnConfig field="dispname" header="Display Name" property="id" sortable="true" width="110">
+                <RenderScript>
+                  <Source>
+                    import sailpoint.object.Identity;
+                    import sailpoint.object.Link;
+                    import sailpoint.object.Application;
+
+                    Identity identity = context.getObjectById(Identity.class, value);
+
+                    String strValue = null;
+
+                    if(identity != void &amp;&amp; identity != null) {
+                    strValue = identity.getAttribute("displayName");
+                    }
+
+                    return strValue;
+                  </Source>
+                </RenderScript>
+              </ReportColumnConfig>
+            </Columns>
+          </LiveReport>
+        </value>
+      </entry>
+      <entry key="reportGroupBy"/>
+      <entry key="reportSortAsc">
+        <value>
+          <Boolean>true</Boolean>
+        </value>
+      </entry>
+      <entry key="reportSortBy" value="dispname"/>
+    </Map>
+  </Attributes>
+  <Description>This report will return list of Terminated users with active accounts</Description>
+  <RequiredRights>
+    <Reference class="sailpoint.object.SPRight" name="FullAccessUserReport"/>
+  </RequiredRights>
+</TaskDefinition>
