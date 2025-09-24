@@ -4,6 +4,8 @@
   <Description>Test Rule</Description>
   <Source>
 
+// This is a test Rule
+
   import java.util.ArrayList;
   import java.util.List;
   import java.util.Iterator;
